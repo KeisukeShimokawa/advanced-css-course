@@ -22,10 +22,306 @@ Dark green: #28b485
   box-sizing: border-box;
 }
 
+/* 
+  CSSの継承を使用することで、bodyにフォントの設定を
+  行っておけば、どの要素にもフォント設定が継承される
+*/
 body {
   font-family: "Lato", sans-serif;
+  /* 
+    フォントの太さを設定する
+    400が normal のサイズとなっている
+  */
   font-weight: 400;
   font-size: 16px;
+  /* 
+    行ボックスの高さを設定できる
+    テキストの行間を設定する際に使用する
+  */
   line-height: 1.7;
   color: #777777;
+  /* 
+    これは30pxをすべての要素に継承させるわけではなく
+    ページ全体の余白を設定している
+    paddingは継承しないプロパティでもある
+  */
+  padding: 30px;
 }
+
+.header {
+  /* 
+    ビューポートに対する高さの割合
+    https://dev.classmethod.jp/articles/css-length-viewport/
+  */
+  height: 95vh;
+  background-image: linear-gradient(
+      to right bottom,
+      rgba(126, 213, 111, 0.8),
+      rgba(85, 197, 122, 0.8)
+    ),
+    url(../img/hero.jpg);
+  /* 
+    背景画像のサイズを設定する
+    auto: 自動計算する
+    cover: 表示領域をすべて埋め尽くす大きさで表示する
+    https://www.tohoho-web.com/css/prop/background-size.htm
+  */
+  background-size: cover;
+  /* 
+    背景画像を設定する場合の基準位置を設定する
+  */
+  background-position: top;
+  /* 
+    表示領域を切り取ることができる
+    左上から時計回りで座標を指定する必要がある
+    https://bennettfeely.com/clippy/
+  */
+  clip-path: polygon(0 0, 100% 0, 100% 75%, 0 100%);
+
+  /* 
+    要素の配置される場所を設定する
+    このオフセットは次の要素の配置に対して影響を与えない
+    初期値の static から relative に変更することで
+    子要素に対して影響を与えないようにしている
+  */
+  position: relative;
+}
+
+.logo-box {
+  /* 
+    親要素が position:static の場合は、
+    親要素の左上を基準位置として、top/left、あるいは、right/bottomで
+    オフセットの絶対位置を指定する
+  */
+  position: absolute;
+  top: 40px;
+  left: 40px;
+}
+
+.logo {
+  height: 35px;
+}
+
+.text-box {
+  position: absolute;
+  /* 
+    ブロック要素として、左上を基準として上から40％、左から50％の場所に配置する
+    ただしコンテンツの座標ではないので、コンテンツが右下寄りになってしまう
+  */
+  top: 40%;
+  left: 50%;
+  /* 
+    ↑ で発生する問題を、transformを使用してコンテンツの座標を中心に設定している
+    https://www.tohoho-web.com/css/prop/transform.htm
+  */
+  transform: translate(-50%, -50%);
+
+  /* 
+    ボタンをinline-block で表現しているため、中心寄せで対応できる
+  */
+  text-align: center;
+}
+
+.header-primary {
+  color: #ffffff;
+  text-transform: uppercase;
+
+  /* アニメーション時に生じる微妙な位置変化を無効にする */
+  backface-visibility: hidden;
+  margin-bottom: 60px;
+}
+
+/* 
+  テキストを中心に配置したりする場合はどのようにすべきか
+  方法としてインライン要素から、ブロック要素に変更すればいい
+*/
+.header-primary-main {
+  display: block;
+  font-size: 60px;
+  font-weight: 400;
+  /* 
+    文字間の間隔を設定する
+  */
+  letter-spacing: 35px;
+
+  /* アニメーションの名前を指定する */
+  animation-name: moveInLeft;
+
+  /* アニメーションの全体の時間を設定できる */
+  animation-duration: 1s;
+
+  /* アニメーションをどのように処理するのか設定できる */
+  animation-timing-function: ease-out;
+
+  /* アニメーションを実行する回数を指定できる */
+  /* animation-iteration-count: 3; */
+
+  /* アニメーションの開始時間を設定する */
+  /* animation-delay: 3s; */
+}
+
+.header-primary-sub {
+  display: block;
+  font-size: 20px;
+  font-weight: 700;
+  letter-spacing: 15px;
+
+  /* animation-name: moveInRight;
+  animation-duration: 1s;
+  animation-timing-function: ease-out; */
+  animation: moveInRight 1s ease-out;
+}
+
+/* 名前を設定する */
+@keyframes moveInLeft {
+  /* パーセントを使用してアニメーションが開始から終了までの設定を追加できる */
+  /* ブラウザは opacity と　transform に最適化されている */
+  0% {
+    /* アニメーションの開始時は見えないようにする */
+    opacity: 0;
+    /* 右側が正の座標なので、マイナス値を指定することで開始地点を左に変更する */
+    transform: translateX(-100px) rotate(0deg);
+  }
+
+  /* 60% {
+    transform: rotate(180deg);
+  } */
+
+  80% {
+    transform: translateX(20px);
+  }
+
+  100% {
+    opacity: 1;
+    /* 最終時は通常時と同じ設定にする */
+    transform: translate(0);
+  }
+}
+
+/* 名前を設定する */
+@keyframes moveInRight {
+  /* パーセントを使用してアニメーションが開始から終了までの設定を追加できる */
+  /* ブラウザは opacity と　transform に最適化されている */
+  0% {
+    /* アニメーションの開始時は見えないようにする */
+    opacity: 0;
+    /* 右側が正の座標なので、マイナス値を指定することで開始地点を左に変更する */
+    transform: translateX(100px);
+  }
+
+  80% {
+    transform: translateX(-20px);
+  }
+
+  100% {
+    opacity: 1;
+    /* 最終時は通常時と同じ設定にする */
+    transform: translate(0);
+  }
+}
+
+/* 
+  疑似クラスを設定できる
+  :link はアンカーリンクのデフォルトの状態を設定する
+  :visited はアンカーリンクをクリックした後の状態を設定する
+*/
+.btn:link,
+.btn:visited {
+  text-transform: uppercase;
+  text-decoration: none;
+  /* 
+    1つ目で上下の余白を設定する
+    2つ目で左右の余白を設定する
+  */
+  padding: 15px 40px;
+  display: inline-block;
+
+  border-radius: 100px;
+
+  /* 
+    アニメーションを設定する場合は @keyframes を設定する方法と
+    transition プロパティを設定する方法が存在している
+
+    初期状態のトランジッションを設定することで、ほかのアニメーションが
+    適用される場合に、どの程度の時間で遷移させるのか設定できる
+  */
+  transition: all 0.2s;
+
+  position: relative;
+}
+
+.btn:hover {
+  transform: translateY(-3px);
+  /* 
+    以下の引数になる
+    4つ: 横方向の影、縦方向の影、ぼかし範囲、拡大範囲、影の色
+    https://www.tohoho-web.com/css/prop/box-shadow.htm
+  */
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+}
+
+.btn:active {
+  transform: translateY(-1px);
+  box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+}
+
+.btn-white {
+  background-color: #ffffff;
+  color: #777777;
+}
+
+/* 
+  指定した要素の直後を意味する
+  要素の後に、文字や画像を追加する際に使用できる
+  今回の場合は、トランジッションの開始地点を設定するために、
+  別途要素を指定するために使用している
+*/
+.btn::after {
+  content: "";
+  display: inline-block;
+  height: 100%;
+  width: 100%;
+  border-radius: 100px;
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: -1;
+
+  /* 
+    ホバーした後の挙動をアニメーションさせるため、
+    初期状態の部分に transition 設定を付与する
+  */
+  transition: all 0.4s;
+}
+
+.btn-white::after {
+  background: #ffffff;
+}
+
+.btn:hover::after {
+  transform: scale(1.5);
+  opacity: 0;
+}
+
+.btn-animated {
+  animation: moveInBottom 0.5s ease-out 0.75s;
+  animation-fill-mode: backwards;
+}
+
+@keyframes moveInBottom {
+  0% {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+
+  100% {
+    opacity: 1;
+    transform: translate(0);
+  }
+}
+
+/* 
+  メモ
+
+
+*/

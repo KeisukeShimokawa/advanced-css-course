@@ -16,6 +16,22 @@
     <title>Natours | Exciting tours for adventurous people</title>
   </head>
   <body>
-    <header>Some Text ...</header>
+    <header class="header">
+      <!-- imgはインライン要素なので、divで囲ってブロック要素にする -->
+      <!-- そのあとで、ブロック要素自体の配置を変えていけばいい -->
+      <div class="logo-box">
+        <img src="./img/logo-white.png" alt="logo" class="logo" />
+      </div>
+
+      <div class="text-box">
+        <!-- 配置場所は同じだけで、適用するスタイルは異なるので、spanで分けておく -->
+        <h1 class="header-primary">
+          <span class="header-primary-main">Outdoor</span>
+          <span class="header-primary-sub">is where life happens</span>
+        </h1>
+
+        <a href="#" class="btn btn-white btn-animated">Discover our tours</a>
+      </div>
+    </header>
   </body>
 </html>

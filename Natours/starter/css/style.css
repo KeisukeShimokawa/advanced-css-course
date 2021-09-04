@@ -87,7 +87,7 @@ body {
   position: relative;
 }
 
-.logo-box {
+.header__logo-box {
   /* 
     親要素が position:static の場合は、
     親要素の左上を基準位置として、top/left、あるいは、right/bottomで
@@ -98,11 +98,11 @@ body {
   left: 40px;
 }
 
-.logo {
+.header__logo {
   height: 35px;
 }
 
-.text-box {
+.header__text-box {
   position: absolute;
   /* 
     ブロック要素として、左上を基準として上から40％、左から50％の場所に配置する
@@ -135,7 +135,7 @@ body {
   テキストを中心に配置したりする場合はどのようにすべきか
   方法としてインライン要素から、ブロック要素に変更すればいい
 */
-.header-primary-main {
+.header-primary--main {
   display: block;
   font-size: 60px;
   font-weight: 400;
@@ -160,7 +160,7 @@ body {
   /* animation-delay: 3s; */
 }
 
-.header-primary-sub {
+.header-primary--sub {
   display: block;
   font-size: 20px;
   font-weight: 700;
@@ -265,7 +265,7 @@ body {
   box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
 }
 
-.btn-white {
+.btn--white {
   background-color: #ffffff;
   color: #777777;
 }
@@ -294,7 +294,7 @@ body {
   transition: all 0.4s;
 }
 
-.btn-white::after {
+.btn--white::after {
   background: #ffffff;
 }
 
@@ -303,7 +303,7 @@ body {
   opacity: 0;
 }
 
-.btn-animated {
+.btn--animated {
   animation: moveInBottom 0.5s ease-out 0.75s;
   animation-fill-mode: backwards;
 }
@@ -322,6 +322,188 @@ body {
 
 /* 
   メモ
+  - 読み込みの順序
+    1. Load HTML
+    2. parse HTML
+        3. Document Object Model (DOM)
+        3. Load CSS
+            - Parse CSS
+                - Resolve Confilcting CSS decorations (cascade)
+                - Process final CSS values
+        4. CSS Object Model
+    3. Render tree
+    4. Website Rendering: Visual Formatting Model
+    5. Final Rendered Website
 
+  ## Parse CSS
+
+  - Selector
+  - Decolaration Block
+  - Decolaration Value
+
+  cascade
+    複数のスタイルシートを1つにして、CSSルールやデコレーションの
+    コンフリクトを解消する。もしも2つ以上のルールが適用される場合
+
+    Author      開発者が設定したもの
+    CSS         ユーザーがブラウザに設定している値（フォントサイズなど）
+    Browser     ブラウザのデフォルト値
+
+    優先度
+    importance > sepecificity > source order
+
+    - importance
+      - `!importance` などを設定すれば最優先される
+      - 開発者やユーザー設定、ブラウザ設定
+        - ここでコンフリクトする場合は、次の設定を確認する
+
+    - specioficity
+      1. インライン
+      2. ID
+      3. クラス
+      4. 要素
+      - point -> (inline, id, class, element)
+
+    - Source Order
+      - CSSに設定されている順番で値が上書きされていく
+
+    ユニバーサルセレクタは優先度の値は (0, 0, 0, 0) である
+
+    3rd-partyのスタイルシートを使用する場合は、順番に注意する必要がある
+    必ず開発者側のスタイルシートは、最後に読み込む必要がある
+
+  ## Value Processing
+
+  1. Declared Value
+  2. Cascaded Value
+  3. Specified Value    # 設定していない場合でも初期値が設定される
+                        # ブラウザは16pxがデフォルト
+  4. Computed Value     # 1.5rem などはこの段階で24pxに計算される
+  5. Used Value
+  6. Actual Value
+
+  - %
+    - 親要素の該当箇所とパーセントの割合を掛けた値
+  - em, em, rem
+    - em(font): 親要素の計算されたフォントサイズ
+    - em(length): 現在の要素の計算されたフォントサイズ
+    - rem: ルート要素の計算されたフォントサイズ
+  - vh, vw
+    - ビューポートと比較した幅や高さ
+
+  ## Inheritance
+
+  親要素から子要素へ値を渡すことで、メンテナンス性を向上させるコードを記述できる
+  テキスト関連は継承される
+    - フォントサイズやフォントファミリー、テキストカラーなど
+  余白などは継承されない
+  計算値は宣言された値ではなく、継承されたもの
+  initial属性を設定することで、初期値を変更できる
+
+  ## px to rem
+  
+  remを活用するための root としてフォントサイズを設定する
+
+  html {
+    // これで 1rem は10pxと計算される
+    font-size: 10px;
+  }
+
+  これで　padding や margin に関しても、remを適用することができる
+
+  テクニックとして以下のようにフォントサイズを計算する
+  - 例えば開発者的には10pxを設定したい
+  - けれど、ユーザーがデフォルトでフォントサイズをブラウザに設定していた場合でも対応したい
+  - その場合は計算式を使用する
+    - font-size: 62.5% // 10/16 px
+
+  - 下記の設定を行うことで、デフォルトでは継承されない box-sizing プロパティを継承させ
+    余分な設定を各CSSで追加する必要がなくなる
+
+  *,
+  *::after,
+  *::before {
+    margin: 0;
+    padding: 0;
+    box-sizing: inherit;
+  }
+
+  body {
+    box-sizing: border-box
+  }
+
+  ## Visual Formatting Model
+
+  - ボックスを計算し、ボックス同士のレイアウトを計算する
+    - Dimensions of boxes
+    - Box type
+    - Position cheme
+    - Stacking contexts
+
+  - ボックスモデル
+    - Content (width, height)
+      - テキストや画像などのコンテンツ
+    - padding
+      - ボックス内部であり、境界線とコンテンツの間の幅
+    - border
+    - margin
+      - ボックス間の幅
+    - fill area 
+      - 背景色や背景画像の設定領域 (borderまで)
+
+    - border-box では width, height が borderまでを意味する
+    
+    - ボックスタイプにも複数存在している
+      - ブロックレベル
+        - 親要素の幅の100％を含む
+        - ボックスモデルの考え方が適用される
+      　- display: block
+        - ほかにも display: flex, list-item, table
+      - インラインボックス
+        - コンテンツの空間のみを占有する
+        - 改行はない
+        - 幅や高さはない
+        - padding や margin は水平領域のみ
+        - display: inline
+      - インラインブロックボックス
+        - コンテンツ領域のみを占有する
+        - 改行はない
+        - ボックスモデルのmargin, paddingなどが適用される
+
+    - Positioning Scheme
+      - normal flow
+        - デフォルト
+        - 
+        - position: relative
+      - floats
+        - normatl flow から除外する
+        - float: left
+        - float: right
+      - absolute positioning
+        - normal flow から除外する
+        - 囲っているコンテンツや要素には影響しない
+        - position: absolute
+        - positionL fixed
+
+  - Stacking Context
+    - レイヤーにスタッキングされていくモデル
+    - z-indexを使用する
+      - z-index: 3, position: relative
+      - z-index: 2, position: absolute
+      - z-index: 1, position: relative
+
+  ## BEM
+
+  - 
+
+  - 7-1 フォルダー
+    - base
+    - component
+    - layout
+    - pages
+    - theme
+    - abstracts
+    - vendors
+  - mainをSASSで作り、穂かはmainを読み込む
 
 */
